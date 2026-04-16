@@ -1,0 +1,94 @@
+version: "3.9"
+
+services:
+  node1:
+    build : .
+    container_name: node01
+    hostname: node01
+    ports:
+      - "8480:8480"   # JournalNode HTTP UI
+      - "9871:9870"   # Namenode UI
+      # - "8081:8088" # YARN UI (Disabled to save RAM)
+    command: bash /start.sh
+    volumes:
+    - ./jn1:/opt/data/journalnode
+    - ./shared:/opt/hadoop/etc/hadoop   # FIXED: Linux relative path
+    - ./shared:/root/.ssh               # FIXED
+    - ./nn1:/shared/nn
+    - ./start.sh:/start.sh
+    - ./data:/data
+    networks:
+      - cluster-network
+
+  node2:
+    build : .
+    container_name: node02
+    hostname: node02
+    ports:
+      - "8481:8480"
+      - "9872:9870"
+      # - "8082:8088"
+    command: bash /start.sh
+    volumes:
+    - ./jn2:/opt/data/journalnode
+    - ./shared:/opt/hadoop/etc/hadoop
+    - ./shared:/root/.ssh
+    - ./nn2:/shared/nn
+    - ./start.sh:/start.sh
+    - ./data:/data
+    networks:
+      - cluster-network
+
+  node3:
+    build : .
+    container_name: node03
+    hostname: node03
+    ports:
+      - "8482:8480"
+      - "9864:9864"   # DataNode UI
+    command: bash /start.sh
+    volumes:
+    - ./jn3:/opt/data/journalnode
+    - ./shared:/opt/hadoop/etc/hadoop
+    - ./shared:/root/.ssh
+    - ./dn3:/shared/dn
+    - ./start.sh:/start.sh
+    - ./data:/data
+    networks:
+      - cluster-network
+
+  node4:
+    build : .
+    container_name: node04
+    hostname: node04
+    ports:
+      - "9865:9864"
+    command: bash /start.sh
+    volumes:
+    - ./dn4:/shared/dn
+    - ./shared:/opt/hadoop/etc/hadoop
+    - ./shared:/root/.ssh
+    - ./start.sh:/start.sh
+    - ./data:/data
+    networks:
+      - cluster-network
+
+  node5:
+    build : .
+    container_name: node05
+    hostname: node05
+    ports:
+      - "9866:9864"
+    command: bash /start.sh
+    volumes:
+    - ./dn5:/shared/dn
+    - ./shared:/opt/hadoop/etc/hadoop
+    - ./shared:/root/.ssh
+    - ./start.sh:/start.sh
+    - ./data:/data
+    networks:
+      - cluster-network
+
+networks:
+  cluster-network:
+    driver: bridge
